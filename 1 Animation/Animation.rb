@@ -2,11 +2,7 @@
 
 class Image
 
-	def initialize(fill_char)
-		@fill_char = fill_char
-
-		# imageFile = File.new('human body', 'r')
-
+	def initialize
 		currentDir = File.dirname(__FILE__)
 		fileName = File.join(currentDir, 'human body')
 		chmoded = 0
@@ -56,14 +52,14 @@ end
 #--------------------------------------------------------
 
 Image.clear
-image = Image.new('x')
+image = Image.new
 
 
 startPoint = 20
 distance = 30
 frameDuration = 0.017	# 1/60
 
-while true 
+loop {
 	#  Animate human forwards
 	distance.times { |i|
 		puts
@@ -80,7 +76,7 @@ while true
 		sleep(frameDuration)
 		Image.clear
 	}
-end
+}
  
 
 
