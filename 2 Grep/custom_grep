@@ -1,0 +1,175 @@
+#!/usr/bin/env ruby
+
+require 'ruby-filemagic'
+require 'pry'
+
+
+def parse_arguments (args)
+	previous_option = nil
+	arguments = Hash.new
+	arguments = {
+		:options => {},
+		:pattern => '',
+		:files	 => []}
+	got_pattern = false
+	i = 0
+	while i < args.count do
+		case args[i]
+		when '-R'
+			arguments[:options]['-R'] = ''
+			i = i + 1
+		when '-A'
+			arguments[:options]['-A'] = args[i + 1]
+			i = i + 2
+		when '-z'
+			arguments[:options]['-z'] = ''
+			i = i + 1
+		else
+			if got_pattern
+				arguments[:files] << args[i]
+				i = i + 1
+			else
+				arguments[:pattern] = args[i]
+				got_pattern = true
+				i = i + 1
+			end
+		end
+	end
+	return arguments
+end	
+
+def is_binary_file (file_name)
+	begin
+    	fm = FileMagic.new(FileMagic::MAGIC_MIME)
+    	!(fm.file(file_name) =~ /^text\//)
+
+			# binding.pry
+  	ensure
+    	fm.close
+  	end
+end
+
+def search_in_file (file_name, search_string)
+	#   This is binary file
+	if is_binary_file(file_name)
+		return nil 
+	end
+
+	#   Open file
+	chmoded = 0
+	begin
+		file = File.open(file_name)
+		text = file.read
+	rescue
+	  	File.chmod(0644, file_name) rescue nil
+	  	chmoded += 1
+	  	retry if chmoded < 2
+	ensure
+		file.close
+	end
+
+		
+	#   Search matches
+	results = []
+	text.lines.each { |line|
+		local_result = line.scan(search_string)
+		if local_result.count > 0
+			results << line 
+		end
+	}
+	return results
+end
+
+def search_in_files (files, search_string, recursive = false)
+	many_slashes = '//////////////////////////////////////////////////////'
+	files.each { |file_name|
+		# binding.pry
+		if File.exists?(file_name)
+			if File.directory?(file_name)
+				if recursive
+					search_in_directory(file_name, search_string)
+				else	
+					puts "\n#{file_name} is directory"
+				end
+			else
+				results = search_in_file(file_name, search_string)
+				# binding.pry
+				if results 
+					if results.count > 0
+						puts "\n#{many_slashes}\n#{file_name}\n\n" 
+						results.each { |element|
+							puts element
+						}
+					end
+				elsif !recursive
+					puts "\n#{file_name} is binary"
+				end
+			end
+		else
+			puts "\n#{file_name} doesn't exist"
+		end
+	# files.each { |file_name|
+	# 	if !File.exists?(file_name)
+	# 		puts "\n#{file_name} doesn't exist"
+	# 	elsif !File.directory?(file_name)
+	# 		results = search_in_file(file_name, search_string)
+	# 		# binding.pry
+	# 		if results 
+	# 			if results.count > 0
+	# 				puts "\n#{many_slashes}\n#{file_name}\n\n" 
+	# 				results.each { |element|
+	# 					puts element
+	# 				}
+	# 			end
+	# 		elsif !recursive
+	# 			puts "\n#{file_name} is binary"
+	# 		end
+	# 	elsif !recursive
+	# 		puts "\n#{file_name} is directory"
+	# 	else
+	# 		search_in_directory(file_name, search_string)
+	# 	end
+	}
+end
+
+def search_in_directory (directory_name, search_string)
+	directory = Dir.new(directory_name)
+	# entities = directory.select { |subentity|
+	# 	if subentity.eql?('.') | subentity.eql?('..')
+	# 		nil
+	# 	else
+	# 		File.join(directory_name, subentity)
+	# 	end
+	# }.compact!
+	entities = directory.reject { |file|
+		file[0] == '.'
+	}
+	# binding.pry
+	search_in_files(entities, search_string, false)
+end
+
+#------------------------------------------------------
+#
+#------------------------------------------------------
+
+# fileName = ARGV.last
+# search_string = ARGV[-2]
+
+arguments = parse_arguments(ARGV)
+
+# binding.pry
+#   No file provided
+if arguments[:files].count == 0
+	puts 'Error: No file provided'
+	exit
+end
+
+#   No search string provided
+if arguments[:pattern] == ''
+	puts 'Error: No search pattern provided' 
+	exit
+end
+
+#   Execute
+search_in_files(arguments[:files], arguments[:pattern], arguments[:options]['-R'])
+
