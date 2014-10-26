@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+
 class Image
 
 	def initialize

@@ -108,43 +108,17 @@ def search_in_files (files, search_string, recursive = false)
 		else
 			puts "\n#{file_name} doesn't exist"
 		end
-	# files.each { |file_name|
-	# 	if !File.exists?(file_name)
-	# 		puts "\n#{file_name} doesn't exist"
-	# 	elsif !File.directory?(file_name)
-	# 		results = search_in_file(file_name, search_string)
-	# 		# binding.pry
-	# 		if results 
-	# 			if results.count > 0
-	# 				puts "\n#{many_slashes}\n#{file_name}\n\n" 
-	# 				results.each { |element|
-	# 					puts element
-	# 				}
-	# 			end
-	# 		elsif !recursive
-	# 			puts "\n#{file_name} is binary"
-	# 		end
-	# 	elsif !recursive
-	# 		puts "\n#{file_name} is directory"
-	# 	else
-	# 		search_in_directory(file_name, search_string)
-	# 	end
 	}
 end
 
 def search_in_directory (directory_name, search_string)
 	directory = Dir.new(directory_name)
-	# entities = directory.select { |subentity|
-	# 	if subentity.eql?('.') | subentity.eql?('..')
-	# 		nil
-	# 	else
-	# 		File.join(directory_name, subentity)
-	# 	end
-	# }.compact!
 	entities = directory.reject { |file|
 		file[0] == '.'
+	}.map { |file| 
+		File.join(directory_name, file)
 	}
-	# binding.pry
+	binding.pry
 	search_in_files(entities, search_string, false)
 end
 
