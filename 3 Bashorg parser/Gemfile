@@ -1,0 +1,7 @@
+# A sample Gemfile
+source "https://rubygems.org"
+
+gem 'mechanize'
+gem 'pry'
+# gem 'fastercsv', '~> 1.5.5'
+gem 'json', '~> 1.8.1'
