@@ -42,8 +42,6 @@ def is_binary_file (file_name)
 	begin
     	fm = FileMagic.new(FileMagic::MAGIC_MIME)
     	!(fm.file(file_name) =~ /^text\//)
-
-			# binding.pry
   	ensure
     	fm.close
   	end
@@ -68,7 +66,6 @@ def search_in_file (file_name, search_string)
 		file.close
 	end
 
-		
 	#   Search matches
 	results = []
 	text.lines.each { |line|
@@ -81,7 +78,7 @@ def search_in_file (file_name, search_string)
 end
 
 def search_in_files (files, search_string, recursive = false)
-	many_slashes = '//////////////////////////////////////////////////////'
+	many_slashes = '/' * 50
 	files.each { |file_name|
 		# binding.pry
 		if File.exists?(file_name)
@@ -118,16 +115,13 @@ def search_in_directory (directory_name, search_string)
 	}.map { |file| 
 		File.join(directory_name, file)
 	}
-	binding.pry
+	# binding.pry
 	search_in_files(entities, search_string, false)
 end
 
 #------------------------------------------------------
 #
 #------------------------------------------------------
-
-# fileName = ARGV.last
-# search_string = ARGV[-2]
 
 arguments = parse_arguments(ARGV)
 
