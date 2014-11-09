@@ -3,6 +3,8 @@
 require 'pry'
 require 'drawille'
 
+Point = Struct.new(:x, :y)
+
 class Life
 	LIVING_CONDITION = 2..3
 	GENESIS_CONDITION = 3
@@ -18,21 +20,32 @@ class Life
 		@height = height
 		@generation = first_generation(width, height)
 		@generation_count = 0
+		@to_reverse = []
 	end
 
 	def new_generation
-		new_array = empty_generation(@width, @height)
+		@to_reverse.clear
 		each do |m, n|
 			neighbours_count = calculate_neighbours(m, n, @generation)
-			if (@generation[n][m] == ALIVE_SYMBOL)
-				new_array[n][m] = LIVING_CONDITION.include?(neighbours_count) ? ALIVE_SYMBOL : DEAD_SYMBOL
-			else
-				new_array[n][m] = (GENESIS_CONDITION == neighbours_count) ? ALIVE_SYMBOL : DEAD_SYMBOL
+			if (@generation[n][m] == ALIVE_SYMBOL &&
+				!LIVING_CONDITION.include?(neighbours_count) ||
+				@generation[n][m] == DEAD_SYMBOL &&
+				neighbours_count == GENESIS_CONDITION)
+
+				@to_reverse << Point.new(m, n)
 			end
 		end
+
+		@to_reverse.each do |point|
+			if (@generation[point.y][point.x] == ALIVE_SYMBOL)
+				@generation[point.y][point.x] = DEAD_SYMBOL
+			else
+				@generation[point.y][point.x] = ALIVE_SYMBOL
+			end
+		end
+
 		@generation_count += 1
-		# binding.pry
-		@generation = new_array
+		@generation
 	end
 
 	def start_game
