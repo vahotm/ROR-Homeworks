@@ -35,6 +35,32 @@ class Life
 		@generation = new_array
 	end
 
+	def start_game
+		prev_state_1 = 0;
+		prev_state_2 = 0;
+		# binding.pry
+
+		flipbook = Drawille::FlipBook.new
+		flipbook.play do
+			if (@generation_count.even?)
+				prev_state_1 = @generation.hash
+			else
+				prev_state_2 = @generation.hash
+			end
+			canvas = to_canvas
+			new_generation
+			if (@generation.hash == prev_state_1 ||
+				@generation.hash == prev_state_2)
+				break
+			end
+			canvas
+		end
+		puts "Life ended after #{@generation_count} generations"
+	end
+
+	#----------------------------------
+	private
+
 	def to_canvas
 		canvas = Drawille::Canvas.new
 		# binding.pry
@@ -43,9 +69,6 @@ class Life
 		end
 		canvas
 	end
-
-	#----------------------------------
-	private
 
 	def empty_generation(width, height)
 		Array.new(height) {Array.new(width, DEAD_SYMBOL)}
@@ -81,31 +104,6 @@ class Life
 end
 
 #======================================
-
-def start_game(life)
-	prev_state_1 = 0;
-	prev_state_2 = 0;
-	# binding.pry
-
-	flipbook = Drawille::FlipBook.new
-	flipbook.play do
-		if (life.generation_count.even?)
-			prev_state_1 = life.generation.hash
-		else
-			prev_state_2 = life.generation.hash
-		end
-		canvas = life.to_canvas
-		life.new_generation
-		if (life.generation.hash == prev_state_1 ||
-			life.generation.hash == prev_state_2)
-			break
-		end
-		canvas
-	end
-	puts "Life ended after #{life.generation_count} generations"
-end
-
-#======================================
 #============MAIN======================
 #======================================
 
@@ -124,7 +122,7 @@ end
 # Start game
 life = Life.new(width, height)
 begin
-	start_game(life)
+	life.start_game
 rescue Interrupt
 	puts "\nLife interrupted after #{life.generation_count} generations"
   	exit!
