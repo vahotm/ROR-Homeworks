@@ -1,0 +1,15 @@
+.wrapper
+  - if @items.any?
+    table.life
+      - for line in @items
+        tr
+          - for cell in line
+            - if cell == 0
+              td.dead
+            - else
+              td.alive
+                .circle
+                / svg  xmlns="http://www.w3.org/2000/svg"
+                /   circle#greencircle cx="10" cy="10" r="9" fill="black"
+  - else
+    p No life found on this website.

@@ -1,0 +1,101 @@
+
+/* Reset */
+/*html, body, div, table, tr, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}*/
+
+@font-face {
+  font-family: "Calluna Sans Black";
+  font-style: normal;
+  font-weight: bold;
+  src: 	url("http://assets.tumblr.com/fonts/callunasans/CallunaSansBlack-webfont.woff?3") format("woff"), 
+  		url("http://assets.tumblr.com/fonts/callunasans/CallunaSansBlack-webfont.ttf?3") format("truetype");
+}
+
+
+h1#title {
+	/*background-color: #fceb84;*/
+	/*color: #444;*/
+	background-color: #292b2e;
+	color: #fff;
+	font-family: Calluna Sans Black;
+	font-size: 40px;
+	text-align: center;
+	padding: 30px 0;
+	margin: 0 0 20px 0;
+}
+
+.sideMenu {
+	margin: 0 3%;
+	width: 110px;
+	float: left;
+}
+
+.menuItem {
+	margin-bottom: 10px;
+  	font-family: Calluna Sans Black;
+  	text-align: right;
+}
+
+.menuItem#primary {
+  	font-size: 22px;
+}
+
+.menuItem#secondary {
+  	font-size: 16px;
+}
+
+.wrapper {
+	margin-bottom: 20px;
+}
+
+.rigthBlock {
+	background-color: gray;
+}
+
+table.life {
+	border-collapse: collapse;
+	border-spacing: 0;
+  	/*margin-left: auto;
+  	margin-right: auto;*/
+}
+
+table.life td {
+	border-width: 1px;
+	border-style: solid;
+	width: 22px;
+	height: 22px;
+}
+
+.circle {
+/* 	-moz-border-radius: 50px/50px;
+    -webkit-border-radius: 50px 50px; */
+/*     border:solid px #f00;  */
+    border-radius: 18px/18px;;
+    width:18px;
+    height:18px; 
+    margin: 1px;
+	background-color: #008000
+}
+
+/*
+svg {
+	width: 20px;
+	height: 20px;
+	margin: 1px;
+}
+
+svg circle {
+	fill: green;
+}
+*/
+
+a:link {color: #4183c4; text-decoration: none; }
+a:active {color: #008000; text-decoration: underline; }
+a:visited {color: #4183c4; text-decoration: none; }
+a:hover {color: #00000; text-decoration: underline; }

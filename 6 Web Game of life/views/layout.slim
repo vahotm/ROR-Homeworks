@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title Game of life
+    link href="/reset.css" rel="stylesheet" type="text/css"
+    link href="/style.css" rel="stylesheet" type="text/css"
+    / javascript:
+    /   alert('Slim supports embedded javascript!')
+
+  body
+    .header
+      h1#title Game of Life
+
+    / #content
+    /   p This example shows you how a basic Slim file looks.
+
+    .sideMenu
+      .menuItem#primary
+        a href="/next" Evolve >
+      .menuItem#secondary
+        a href="/new" New game
+      .menuItem#secondary
+        a href="/back" Revert <      
+
+    == yield

@@ -1,0 +1,138 @@
+#!/usr/bin/env ruby
+
+require 'pry'
+require 'sinatra'
+require 'sinatra/contrib'
+require 'data_mapper'
+require 'slim'
+require 'sass'
+
+require 'zlib'
+require 'SecureRandom'
+# require 'sqlite3'
+# require 'dm-sqlite-adapter'
+
+require_relative './Life.rb'
+require_relative './model/Generation.rb'
+require_relative './model/User.rb'
+
+DataMapper::Logger.new($stdout, :debug)
+DataMapper.setup(:default, "sqlite3://#{Dir.pwd}/mydatabase.db")
+# DataMapper.setup(:default, 'mysql://user:password@hostname/database')
+DataMapper.finalize.auto_upgrade!
+
+@@generations_limit = 10
+
+get '/' do
+	width = 30;
+	height = 30;
+
+	#  If user played before, than take his game from DB, else create new game
+	user_guid = cookies[:user_guid]
+	if user_guid
+		# binding.pry
+		# user = User.get(user_guid)
+		user = User.first(:guid => user_guid)
+		if !user
+			user = User.create(
+				:guid => user_guid,
+				:generations_count => 1
+			)
+		end
+		# binding.pry
+		generation = Generation.last(:user => {:guid => user_guid})
+		if generation
+			life = Life.new(generation.width, generation.height, deserialize_generation(generation.state))
+		else
+			life = Life.new(width, height, nil)
+			generation = Generation.create(
+				:state => 	serialize_generation(life.generation),
+				:width => 	width,
+				:height => 	height
+			)
+			user.generations << generation
+			user.save
+		end
+	else
+		# binding.pry
+		cookies[:user_guid] = SecureRandom::uuid
+		user = User.create(
+			:guid => cookies[:user_guid], 
+			:generations_count => 1
+		)
+		life = Life.new(width, height, nil)
+
+		# Generation.all.destroy
+		generation = Generation.create(
+			:state => 	serialize_generation(life.generation),
+			:width => 	width,
+			:height => 	height
+		)
+
+		user.generations << generation
+		user.save
+	end
+
+	@items = life.generation
+  	slim :generation_table
+end
+
+get '/new' do
+	#  If user is in DB, then remove all his records, then redirect to /
+	user_guid = cookies[:user_guid]
+	if user_guid
+		Generation.all(:user => {:guid => user_guid}).destroy
+	end
+
+	redirect '/'
+end
+
+get '/next' do
+	user_guid = cookies[:user_guid]
+	if user_guid
+		# binding.pry
+		# user = User.get(user_guid)
+		user = User.first(:guid => user_guid)
+		if !user
+			redirect '/'
+		end
+		generation = Generation.last(:user => {:guid => user_guid})
+		if generation
+			life = Life.new(generation.width, generation.height, deserialize_generation(generation.state))
+			life.new_generation
+		else
+			redirect '/'
+		end
+
+		@items = life.generation
+
+		generation = Generation.create(
+			:state => 	serialize_generation(@items),
+			:width => 	life.width,
+			:height => 	life.height
+		)
+		user.generations << generation
+		user.generations_count += 1
+
+
+		if user.generations.count > 10
+			user.generations.first.destroy
+		end
+
+		user.save
+	else
+		redirect '/'
+	end
+
+  	slim :generation_table
+end
+
+#=============================================
+
+def serialize_generation(life_array)
+	Zlib::Deflate.deflate(Marshal.dump(life_array))
+end
+
+def deserialize_generation(object)
+	Marshal.load(Zlib::Inflate.inflate(object))
+end

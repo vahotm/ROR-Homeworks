@@ -1,0 +1,16 @@
+# A sample Gemfile
+source "https://rubygems.org"
+
+# gem "rails"
+gem 'pry'
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'drawille', '~> 0.3.2'
+gem 'slim'
+gem 'sass'
+
+gem 'data_mapper'
+gem 'dm-mysql-adapter'
+gem "sqlite3"
+gem "dm-sqlite-adapter"
